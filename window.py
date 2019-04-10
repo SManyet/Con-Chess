@@ -1,0 +1,69 @@
+#!/usr/bin/python
+# window.py: class file for managing display with curses
+
+import curses
+# import board
+from curses.textpad import rectangle
+
+class Window:
+    def __init__(self, screen):
+        self.screen = screen
+        self.maxlines = curses.LINES - 1
+        self.maxcols = curses.COLS - 1
+
+        screen.clear()
+        curses.cbreak()
+        # curses.noecho()
+    
+    def display(self, board):
+        board_array = board.get_board_array()
+        
+        self.board_display(board_array)
+        self.cap_display(board.get_white_cap(), board.get_black_cap())
+        self.screen.refresh()
+
+    def board_display(self, board_array):
+        counter = 0
+        for c in range(34):
+            for l in range(17):
+                    if c % 4 == 1:
+                        self.screen.addch(l, c, '|')
+                    elif l % 2 == 0 and c > 0:
+                        self.screen.addch(l, c, '-')
+                    elif c % 4 == 3:
+                        i = counter // 8
+                        j = counter % 8
+                        piece = board_array[j][i]
+                        if piece:
+                            self.screen.addch(l, c, piece.get_symbol())
+                        else:
+                            self.screen.addch(l, c, ' ')
+                        counter += 1
+
+    def cap_display(self, white_cap, black_cap):
+        white_index = 0
+        black_index = 0
+        for c in range(40, 47):
+            for l in range(13):
+                # self.screen.addch(l, c, '#')
+                if c == 40 or c == 43 or c == 46:
+                    self.screen.addch(l, c, "|")
+                elif l == 0 or l == 2 or l == 12:
+                    self.screen.addch(l, c, '-')
+                elif l > 2:
+                    if white_index < len(white_cap):
+                        symbol = white_cap[white_index].get_symbol()
+                        self.screen.addch(l, c, symbol)
+                        white_index += 1
+                    elif black_index < len(black_cap) and c > 43:
+                        symbol = black_cap[black_index].get_symbol()
+                        self.screen.addch(l, c, symbol)
+                        black_index += 1
+
+
+        self.screen.addch(1, 41, 'W')
+        self.screen.addch(1, 44, 'B')
+    
+    def exit(self):
+        self.screen.getch()
+        curses.endwin()
