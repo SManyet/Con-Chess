@@ -5,23 +5,18 @@ import curses, board, window
 
 def main(screen):
     win = window.Window(screen)
-    b = board.Board(win)
-    
-    win.display(b)
-    
-    movestr = screen.getch()
-    cap, move b.parse_input(movestr)
-    
-    '''
-    move [(ipoint), (fpoint)] if valid, empty otherwise
-    '''
-    
-    if move:
-        if cap:
-            b.cap
+    b = board.Board()
+    game = True
 
     win.display(b)
+    while game:
 
-    win.exit()
+        move_str = win.get_move()
+        if move_str == b'exit':
+            game = win.exit()
+        elif not b.parse_input(move_str):
+            win.bad_move()
+    
+        win.display(b)
 
 curses.wrapper(main)

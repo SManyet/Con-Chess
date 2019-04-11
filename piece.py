@@ -10,7 +10,7 @@ class Piece:
     def set_pos(self, fpoint):
         self.pos = fpoint
 
-    def get_moves(self):
+    def get_valid_moves(self):
         pass
 
     def get_pos(self):

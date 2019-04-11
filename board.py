@@ -21,26 +21,33 @@ class Board:
 
         return temp
 
-    def parse_input(self, movestr):
-        # test vvv
-        self.cap_piece((1, 6))
-        # TODO update window?
-        self.move((1, 1), (1, 6))
+    def parse_input(self, move_str):
+        ipoint, fpoint = eval(move_str)
+        # Determine cap
+        ipiece = self.board_array[ipoint[0]][ipoint[1]]
+        fpiece = self.board_array[fpoint[0]][fpoint[1]]
+        if fpiece:
+            if (fpiece.get_color() == ipiece.get_color()):
+                return False
+            else:
+                self.cap_piece(fpoint)
+        self.move_piece(ipoint, fpoint)
+        return True
     
-    def move(self, ipoint, fpoint):
+    def move_piece(self, ipoint, fpoint):
         p = self.board_array[ipoint[0]][ipoint[1]]
         self.board_array[fpoint[0]][fpoint[1]] = p
         p.set_pos(fpoint)
         self.board_array[ipoint[0]][ipoint[1]] = None
 
-    def cap_piece(self, ipoint):
-        p = self.board_array[ipoint[0]][ipoint[1]]
+    def cap_piece(self, fpoint):
+        p = self.board_array[fpoint[0]][fpoint[1]]
         if p.get_color():
             self.black_cap.append(p)
         else:
             self.white_cap.append(p)
 
-        self.board_array[ipoint[0]][ipoint[1]] = None
+        self.board_array[fpoint[0]][fpoint[1]] = None
     
     def get_board_array(self):
         return self.board_array

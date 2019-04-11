@@ -13,13 +13,20 @@ class Window:
 
         screen.clear()
         curses.cbreak()
-        # curses.noecho()
+        curses.echo()
     
+
+
+    ''' Methods for displayling the game to terminal
+            should remain indepent from other processes to assist training speed
+    '''
     def display(self, board):
         board_array = board.get_board_array()
         
         self.board_display(board_array)
         self.cap_display(board.get_white_cap(), board.get_black_cap())
+        self.screen.addstr(self.maxlines, 1, "                      ")
+
         self.screen.refresh()
 
     def board_display(self, board_array):
@@ -64,6 +71,20 @@ class Window:
         self.screen.addch(1, 41, 'W')
         self.screen.addch(1, 44, 'B')
     
+
+
+
+
+    ''' get, set, and other functional methods'''
+
+    def bad_move(self):
+        self.screen.addstr(15, self.maxcols//2, "get fucked nerd")
+    
+    def get_move(self):
+        return self.screen.getstr(self.maxlines, 1)
+    
     def exit(self):
+        self.screen.addstr(self.maxlines - 1, 1, "press ENTER to exit")
         self.screen.getch()
         curses.endwin()
+        return False
