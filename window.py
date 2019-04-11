@@ -33,19 +33,26 @@ class Window:
         counter = 0
         for c in range(34):
             for l in range(17):
-                    if c % 4 == 1:
-                        self.screen.addch(l, c, '|')
-                    elif l % 2 == 0 and c > 0:
-                        self.screen.addch(l, c, '-')
-                    elif c % 4 == 3:
-                        i = counter // 8
-                        j = counter % 8
-                        piece = board_array[j][i]
-                        if piece:
-                            self.screen.addch(l, c, piece.get_symbol())
-                        else:
-                            self.screen.addch(l, c, ' ')
-                        counter += 1
+                if c % 4 == 1:
+                    self.screen.addch(l, c, '|')
+                elif l % 2 == 0 and c > 1:
+                    self.screen.addch(l, c, '-')
+                elif c % 4 == 3:
+                    # translate between screen and board indicies
+                    i = counter // 8
+                    j = counter % 8
+
+                    # draw rank and file
+                    self.screen.addch(l, 0, str(8 - j))
+                    self.screen.addch(17, c, chr(i + 65))
+                    
+                    # draw pieces
+                    piece = board_array[j][i]
+                    if piece:
+                        self.screen.addch(l, c, piece.get_symbol())
+                    else:
+                        self.screen.addch(l, c, ' ')
+                    counter += 1
 
     def cap_display(self, white_cap, black_cap):
         white_index = 0
