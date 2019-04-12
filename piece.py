@@ -21,3 +21,4 @@ class Piece:
 
     def get_symbol(self):
         return self.symbol
+

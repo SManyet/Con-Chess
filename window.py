@@ -25,6 +25,8 @@ class Window:
         
         self.board_display(board_array)
         self.cap_display(board.get_white_cap(), board.get_black_cap())
+        self.move_display(board.get_move_history())
+
         self.screen.addstr(self.maxlines, 1, "                      ")
 
         self.screen.refresh()
@@ -79,15 +81,23 @@ class Window:
         self.screen.addch(1, 44, 'B')
     
 
-
-
+    def move_display(self, move_history):
+        index = 0
+        for c in range(49, 65):
+            for l in range(13):
+                if c == 49 or c == 64:
+                    self.screen.addch(l, c, '|')
+                elif l == 0 or l == 12:
+                    self.screen.addch(l, c, '-')
+                elif l > 0 and l - 1 < len(move_history):
+                    self.screen.addstr(l, 50, move_history[len(move_history) - l])
 
     ''' get, set, and other functional methods'''
 
     def bad_move(self):
         self.screen.addstr(15, self.maxcols//2, "get fucked nerd")
     
-    def get_move(self):
+    def input_move(self):
         return self.screen.getstr(self.maxlines, 1)
     
     def exit(self):
