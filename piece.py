@@ -8,6 +8,27 @@ class Piece:
         self.symbol = symbol
         self.valid_moves = []
 
+    def follow_path(self, board_array, inc):
+        i, j = self.pos
+        di, dj = inc
+        count = 1
+        while True:
+            row = i+count*di
+            col = j+count*dj
+            if row > -1 and row < 8 and col > -1 and col < 8:
+                piece = board_array[row][col]
+                if piece:
+                    if piece.get_color() != self.color:
+                        self.valid_moves.append((row, col))
+                        return False
+                    else:
+                        return False
+                else: 
+                    self.valid_moves.append((row, col))
+                    count+=1
+            else:
+                return False
+
     def set_pos(self, fpoint):
         self.pos = fpoint
 
@@ -19,30 +40,6 @@ class Piece:
 
     def get_symbol(self):
         return self.symbol
-
-class King(Piece):
-    def __init__(self, pos, color, symbol):
-        super().__init__(pos, color, symbol)
-
-    def get_valid_moves(self, board_array):
-        '''
-        TODO: castle and castle through check
-        '''
-    
-        i, j = self.pos
-
-        for row in (i-1, i, i+1):
-            if i+1 != 8 and i-1 != -1:
-                for col in (j-1, j, j+1):
-                    if col+1 != 8 and col-1 != -1:
-                        p = board_array[i][j]
-                        if p:
-                            if p.get_color() != self.color:
-                                self.valid_moves.append((i, j))
-                        else:
-                            self.valid_moves.append((i, j))
-        
-        return self.valid_moves
 
 class King(Piece):
     def __init__(self, pos, color, symbol):
@@ -103,9 +100,10 @@ class Rook(Piece):
         super().__init__(pos, color, symbol)
 
     def get_valid_moves(self, board_array):
-        for i in range(8):
-            for j in range(8):
-                self.valid_moves.append((i, j))
+        self.follow_path(board_array, (1, 0))
+        self.follow_path(board_array, (-1, 0))
+        self.follow_path(board_array, (0, 1))
+        self.follow_path(board_array, (0, -1))
         return self.valid_moves
 
 class Pawn(Piece):
@@ -131,5 +129,4 @@ class Pawn(Piece):
                     self.valid_moves.append((i+offset, col))
                     if self.color == (i == 7) or self.color == (not i == 2) and not board_array[i+2*offset][j]:
                         self.valid_moves.append((i+2*offset, j))
-            self.valid_moves
         return self.valid_moves
