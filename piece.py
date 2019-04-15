@@ -70,9 +70,14 @@ class Queen(Piece):
         super().__init__(pos, color, symbol)
 
     def get_valid_moves(self, board_array):
-        for i in range(8):
-            for j in range(8):
-                self.valid_moves.append((i, j))
+        self.follow_path(board_array, (1,0))
+        self.follow_path(board_array, (-1,0))
+        self.follow_path(board_array, (0,1))
+        self.follow_path(board_array, (0,-1))
+        self.follow_path(board_array, (1,1))
+        self.follow_path(board_array, (-1,1))
+        self.follow_path(board_array, (1,-1))
+        self.follow_path(board_array, (-1,-1))
         return self.valid_moves
 
 class Bishop(Piece):
