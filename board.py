@@ -31,21 +31,21 @@ class Board:
             istr = self.eval_pos(move_str[:2])
             cap = move_str[2]
             fstr = self.eval_pos(move_str[3:])
-        elif not istr or not fstr:
-            return False
-        else:
-            ipoint = self.trans_rank_file(istr)
-            fpoint = self.trans_rank_file(fstr)
+            if not istr or not fstr:
+                return False
+            else:
+                ipoint = self.trans_rank_file(istr)
+                fpoint = self.trans_rank_file(fstr)
 
-            ipiece = self.board_array[ipoint[0]][ipoint[1]]
-            fpiece = self.board_array[fpoint[0]][fpoint[1]]
+                ipiece = self.board_array[ipoint[0]][ipoint[1]]
+                fpiece = self.board_array[fpoint[0]][fpoint[1]]
 
-            if fpiece:
-                if (fpiece.get_color() == ipiece.get_color()):
-                    self.move_history.pop()
-                    return False
-                else:
-                    self.cap_piece(fpoint)
+                if fpiece:
+                    if (fpiece.get_color() == ipiece.get_color()):
+                        self.move_history.pop()
+                        return False
+                    else:
+                        self.cap_piece(fpoint)
             self.move_piece(ipoint, fpoint)
             self.move_history.append(move_str)
             return True
