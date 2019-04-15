@@ -16,12 +16,10 @@ def main(screen):
             game = win.exit()
         elif b.parse_input(move_str):
             win.good_move()
+            b.inc_turn()
         else:
             win.bad_move()
         
-        b.inc_turn()
         win.display(b)
-
-    os.system("./music.sh")
 
 curses.wrapper(main)

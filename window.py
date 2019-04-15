@@ -17,7 +17,7 @@ class Window:
     
 
 
-    ''' Methods for displayling the game to terminal
+    ''' Methods for displaying the game to terminal
             should remain indepent from other processes to assist training speed
     '''
     def display(self, board):

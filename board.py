@@ -10,7 +10,7 @@ class Board:
         self.black_cap = []
         self.move_history = []
         self.move_dict = {"a": 0, "b": 1, "c": 2, "d": 3, "e": 4, "f": 5, "g": 6, "h": 7, "-": False, "x": True}
-        self.turn = 0
+        self.turn = 1
 
     def init_board_array(self):
         temp = [[piece.Rook((0, 0), False, 'r'), piece.Knight((0, 1), False, 'n'), piece.Bishop((0, 2), False, 'b'), piece.King((0, 3), False, 'k'), piece.Queen((0, 4), False, 'q'), piece.Bishop((0, 5), False, 'b'), piece.Knight((0, 6), False, 'n'), piece.Rook((0, 7), False, 'r')],
@@ -58,8 +58,9 @@ class Board:
         return (findex, rindex)
     
     def move_piece(self, ipoint, fpoint):
-        ipiece = self.board_array[ipoint[0]][ipoint[1]]
-        if fpoint in ipiece.get_valid_moves(self.board_array):
+        ipiece = self.board_array[ipoint[0]][ipoint[1]] 
+        valid_moves = ipiece.get_valid_moves(self.board_array)
+        if ipiece.get_color() == (self.turn % 2 == 1) and fpoint in valid_moves:
             fpiece = self.board_array[fpoint[0]][fpoint[1]]
             if fpiece:
                 self.cap_piece(fpiece)

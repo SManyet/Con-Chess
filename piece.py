@@ -123,17 +123,13 @@ class Pawn(Piece):
         for col in (j-1, j, j+1):
             if col != -1 and col != 8:
                 piece = board_array[i+offset][col]
-                if piece and col != j:
-                    if piece.get_color() != self.color:
-                        self.valid_moves.append((i+offset, col))
-                else:
+                if piece:
+                    if col != j:
+                        if piece.get_color() != self.color:
+                            self.valid_moves.append((i+offset, col))
+                elif col == j:
                     self.valid_moves.append((i+offset, col))
-        return self.valid_moves
-
-
-
-
-        for i in range(8):
-            for j in range(8):
-                self.valid_moves.append((i, j))
+                    if self.color == (i == 7) or self.color == (not i == 2) and not board_array[i+2*offset][j]:
+                        self.valid_moves.append((i+2*offset, j))
+            self.valid_moves
         return self.valid_moves
