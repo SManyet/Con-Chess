@@ -1,4 +1,4 @@
-#!/usr/bin/python
+#!usr/bin/python
 # window.py: class file for managing display with curses
 
 import curses
@@ -93,6 +93,9 @@ class Window:
                     self.screen.addstr(l, 50, move_history[len(move_history) - l])
 
     ''' get, set, and other functional methods'''
+
+    def good_move(self):
+        self.screen.addstr(15, self.maxcols//2, "good move      ")
 
     def bad_move(self):
         self.screen.addstr(15, self.maxcols//2, "get fucked nerd")

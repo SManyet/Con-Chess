@@ -14,7 +14,9 @@ def main(screen):
         move_str = win.input_move().decode("utf-8")
         if move_str == "exit":
             game = win.exit()
-        elif not b.parse_input(move_str):
+        elif b.parse_input(move_str):
+            win.good_move()
+        else:
             win.bad_move()
     
         win.display(b)

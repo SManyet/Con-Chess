@@ -12,14 +12,14 @@ class Board:
         self.move_dict = {"a": 0, "b": 1, "c": 2, "d": 3, "e": 4, "f": 5, "g": 6, "h": 7, "-": False, "x": True}
 
     def init_board_array(self):
-        temp = [[piece.Piece((0, 0), False, 'r'), piece.Piece((1, 0), False, 'n'), piece.Piece((2, 0), False, 'b'), piece.Piece((3, 0), False, 'k'), piece.Piece((4, 0), False, 'q'), piece.Piece((5, 0), False, 'b'), piece.Piece((6, 0), False, 'n'), piece.Piece((7, 0), False, 'r')],
-                [piece.Piece((0, 1), False, 'p'), piece.Piece((1, 1), False, 'p'), piece.Piece((2, 1), False, 'p'), piece.Piece((3, 1), False, 'p'), piece.Piece((4, 1), False, 'p'), piece.Piece((5, 1), False, 'p'), piece.Piece((6, 1), False, 'p'), piece.Piece((7, 1), False, 'p')],
+        temp = [[piece.Rook((0, 0), False, 'r'), piece.Knight((0, 1), False, 'n'), piece.Bishop((0, 2), False, 'b'), piece.King((0, 3), False, 'k'), piece.Queen((0, 4), False, 'q'), piece.Bishop((0, 5), False, 'b'), piece.Knight((0, 6), False, 'n'), piece.Rook((0, 7), False, 'r')],
+                [piece.Pawn((1, 0), False, 'p'), piece.Pawn((1, 1), False, 'p'), piece.Pawn((1, 2), False, 'p'), piece.Pawn((1, 3), False, 'p'), piece.Pawn((1, 4), False, 'p'), piece.Pawn((1, 5), False, 'p'), piece.Pawn((1, 6), False, 'p'), piece.Pawn((1, 7), False, 'p')],
                 [None, None, None, None, None, None, None, None],
                 [None, None, None, None, None, None, None, None],
                 [None, None, None, None, None, None, None, None],
                 [None, None, None, None, None, None, None, None],
-                [piece.Piece((0, 6), True, 'P'), piece.Piece((1, 6), True, 'P'), piece.Piece((2, 6), True, 'P'), piece.Piece((3, 6), True, 'P'), piece.Piece((4, 6), True, 'P'), piece.Piece((5, 6), True, 'P'), piece.Piece((6, 6), True, 'P'), piece.Piece((7, 6), True, 'P')],
-        [piece.Piece((0, 7), 1, 'R'), piece.Piece((1, 7), True, 'N'), piece.Piece((2, 7), True, 'B'), piece.Piece((3, 7), True, 'K'), piece.Piece((4, 7), True, 'Q'), piece.Piece((5, 7), True, 'B'), piece.Piece((6, 7), True, 'N'), piece.Piece((7, 7), True, 'R')]]
+                [piece.Pawn((6, 0), True, 'P'), piece.Pawn((6, 1), True, 'P'), piece.Pawn((6, 2), True, 'P'), piece.Pawn((6, 3), True, 'P'), piece.Pawn((6, 4), True, 'P'), piece.Pawn((6, 5), True, 'P'), piece.Pawn((6, 6), True, 'P'), piece.Pawn((6, 7), True, 'P')],
+        [piece.Rook((7, 0), 1, 'R'), piece.Knight((7, 1), True, 'N'), piece.Bishop((7, 2), True, 'B'), piece.King((7, 3), True, 'K'), piece.Queen((7, 4), True, 'Q'), piece.Bishop((7, 5), True, 'B'), piece.Knight((7, 6), True, 'N'), piece.Rook((7, 7), True, 'R')]]
 
         return temp
 
@@ -29,7 +29,7 @@ class Board:
 
         if len(move_str) == 5:
             istr = self.eval_pos(move_str[:2])
-            cap = move_str[2]
+            # cap = move_str[2]
             fstr = self.eval_pos(move_str[3:])
             if not istr or not fstr:
                 return False
@@ -37,18 +37,11 @@ class Board:
                 ipoint = self.trans_rank_file(istr)
                 fpoint = self.trans_rank_file(fstr)
 
-                ipiece = self.board_array[ipoint[0]][ipoint[1]]
-                fpiece = self.board_array[fpoint[0]][fpoint[1]]
-
-                if fpiece:
-                    if (fpiece.get_color() == ipiece.get_color()):
-                        self.move_history.pop()
-                        return False
-                    else:
-                        self.cap_piece(fpoint)
-            self.move_piece(ipoint, fpoint)
-            self.move_history.append(move_str)
-            return True
+            if self.move_piece(ipoint, fpoint):
+                self.move_history.append(move_str)
+                return True
+            else:
+                return False
 
     def eval_pos(self, pos):
         if ord(pos[0]) > 104 or ord(pos[0]) < 97:
@@ -64,19 +57,23 @@ class Board:
         return (findex, rindex)
     
     def move_piece(self, ipoint, fpoint):
-        p = self.board_array[ipoint[0]][ipoint[1]]
-        self.board_array[fpoint[0]][fpoint[1]] = p
-        p.set_pos(fpoint)
-        self.board_array[ipoint[0]][ipoint[1]] = None
-
-    def cap_piece(self, fpoint):
-        p = self.board_array[fpoint[0]][fpoint[1]]
-        if p.get_color():
-            self.black_cap.append(p)
+        ipiece = self.board_array[ipoint[0]][ipoint[1]]
+        if fpoint in ipiece.get_valid_moves(self.board_array):
+            fpiece = self.board_array[fpoint[0]][fpoint[1]]
+            if fpiece:
+                self.cap_piece(fpiece)
+            self.board_array[fpoint[0]][fpoint[1]] = ipiece
+            ipiece.set_pos(fpoint)
+            self.board_array[ipoint[0]][ipoint[1]] = None
+            return True
         else:
-            self.white_cap.append(p)
+            return False
 
-        self.board_array[fpoint[0]][fpoint[1]] = None
+    def cap_piece(self, fpiece):
+        if fpiece.get_color():
+            self.black_cap.append(fpiece)
+        else:
+            self.white_cap.append(fpiece)
     
     
     
