@@ -18,7 +18,8 @@ def main(screen):
             win.good_move()
         else:
             win.bad_move()
-    
+        
+        b.inc_turn()
         win.display(b)
 
     os.system("./music.sh")

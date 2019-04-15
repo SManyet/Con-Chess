@@ -113,6 +113,26 @@ class Pawn(Piece):
         super().__init__(pos, color, symbol)
 
     def get_valid_moves(self, board_array):
+        i, j = self.pos
+        offset = None
+        if self.color:
+            offset = -1
+        else:
+            offset = 1
+
+        for col in (j-1, j, j+1):
+            if col != -1 and col != 8:
+                piece = board_array[i+offset][col]
+                if piece and col != j:
+                    if piece.get_color() != self.color:
+                        self.valid_moves.append((i+offset, col))
+                else:
+                    self.valid_moves.append((i+offset, col))
+        return self.valid_moves
+
+
+
+
         for i in range(8):
             for j in range(8):
                 self.valid_moves.append((i, j))

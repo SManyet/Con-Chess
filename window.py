@@ -26,6 +26,7 @@ class Window:
         self.board_display(board_array)
         self.cap_display(board.get_white_cap(), board.get_black_cap())
         self.move_display(board.get_move_history())
+        self.turn_display(board.get_turn())
 
         self.screen.addstr(self.maxlines, 1, "                      ")
 
@@ -91,6 +92,9 @@ class Window:
                     self.screen.addch(l, c, '-')
                 elif l > 0 and l - 1 < len(move_history):
                     self.screen.addstr(l, 50, move_history[len(move_history) - l])
+
+    def turn_display(self, turn):
+        self.screen.addstr(0, 36, str(turn))
 
     ''' get, set, and other functional methods'''
 
