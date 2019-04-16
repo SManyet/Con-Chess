@@ -96,13 +96,13 @@ class Window:
     def turn_display(self, turn):
         self.screen.addstr(0, 36, str(turn))
 
+    
+
+
     ''' get, set, and other functional methods'''
 
-    def good_move(self):
-        self.screen.addstr(15, self.maxcols//2, "good move      ")
-
     def bad_move(self):
-        self.screen.addstr(15, self.maxcols//2, "get fucked nerd")
+        self.screen.addstr(15, self.maxcols//2, "invalid input")
     
     def input_move(self):
         return self.screen.getstr(self.maxlines, 1)

@@ -15,7 +15,6 @@ def main(screen):
         if move_str == "exit":
             game = win.exit()
         elif b.parse_input(move_str):
-            win.good_move()
             b.inc_turn()
         else:
             win.bad_move()
