@@ -28,6 +28,21 @@ class Piece:
                     count+=1
             else:
                 return False
+    
+    def follow_template(self, board_array, template):
+        i, j = self.pos
+        for point in template:
+            row = i + point[0]
+            col = j + point[1]
+            if row < 8 and row > -1 and col < 8 and col > -1:
+                piece = board_array[row][col]
+                if piece:
+                    if piece.get_color() != self.color:
+                        self.valid_moves.append((row, col))
+                else:
+                    self.valid_moves.append((row, col))
+
+
 
     def set_pos(self, fpoint):
         self.pos = fpoint
@@ -44,25 +59,15 @@ class Piece:
 class King(Piece):
     def __init__(self, pos, color, symbol):
         super().__init__(pos, color, symbol)
+        self.template = [(1, 1), (1, 0), (1, -1), (-1, -1),
+                         (-1, 0), (-1, 1), (0, 1), (0, -1)]
+
 
     def get_valid_moves(self, board_array):
         '''
         TODO: castle and castle through check
         '''
-    
-        i, j = self.pos
-
-        for row in [i-1, i, i+1]:
-            if row != 8 and row != -1:
-                for col in [j-1, j, j+1]:
-                    if col != 8 and col != -1:
-                        p = board_array[row][col]
-                        if p:
-                            if p.get_color() != self.color:
-                                self.valid_moves.append((row, col))
-                        else:
-                            self.valid_moves.append((row, col))
-        
+        self.follow_template(board_array, self.template)
         return self.valid_moves
 
 class Queen(Piece):
@@ -96,21 +101,11 @@ class Bishop(Piece):
 class Knight(Piece):
     def __init__(self, pos, color, symbol):
         super().__init__(pos, color, symbol)
+        self.template = [(2, 1), (2, -1), (-2, 1), (-2, -1),
+                         (1, 2), (-1, 2), (1, -2), (-1, -2)]
 
     def get_valid_moves(self, board_array):
-        template = [(2, 1), (2, -1), (-2, 1), (-2, -1),
-                    (1, 2), (-1, 2), (1, -2), (-1, -2)]
-        i, j = self.pos
-        for point in template:
-            row = i + point[0]
-            col = j + point[1]
-            if row < 8 and row > -1 and col < 8 and col > -1:
-                piece = board_array[row][col]
-                if piece:
-                    if piece.get_color() != self.color:
-                        self.valid_moves.append((row, col))
-                else:
-                    self.valid_moves.append((row, col))
+        self.follow_template(board_array, self.template)
         return self.valid_moves
 
 
@@ -138,7 +133,7 @@ class Pawn(Piece):
             offset = 1
 
         for col in (j-1, j, j+1):
-            if col != -1 and col != 8:
+            if col > -1 and col < 8:
                 piece = board_array[i+offset][col]
                 if piece:
                     if col != j:
@@ -146,6 +141,7 @@ class Pawn(Piece):
                             self.valid_moves.append((i+offset, col))
                 elif col == j:
                     self.valid_moves.append((i+offset, col))
-                    if self.color == (i == 7) or self.color == (not i == 2) and not board_array[i+2*offset][j]:
+                    if ((self.color and i == 6) or (not self.color and i ==1)) and not board_array[i+2*offset][j]:
                         self.valid_moves.append((i+2*offset, j))
         return self.valid_moves
+

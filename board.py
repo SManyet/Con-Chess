@@ -59,16 +59,19 @@ class Board:
         return (findex, rindex)
     
     def move_piece(self, ipoint, fpoint):
-        ipiece = self.board_array[ipoint[0]][ipoint[1]] 
-        valid_moves = ipiece.get_valid_moves(self.board_array)
-        if ipiece.get_color() == (self.turn % 2 == 1) and fpoint in valid_moves:
-            fpiece = self.board_array[fpoint[0]][fpoint[1]]
-            if fpiece:
-                self.cap_piece(fpiece)
-            self.board_array[fpoint[0]][fpoint[1]] = ipiece
-            ipiece.set_pos(fpoint)
-            self.board_array[ipoint[0]][ipoint[1]] = None
-            return True
+        ipiece = self.board_array[ipoint[0]][ipoint[1]]
+        if ipiece:
+            valid_moves = ipiece.get_valid_moves(self.board_array)
+            if ipiece.get_color() == (self.turn % 2 == 1) and fpoint in valid_moves:
+                fpiece = self.board_array[fpoint[0]][fpoint[1]]
+                if fpiece:
+                    self.cap_piece(fpiece)
+                self.board_array[fpoint[0]][fpoint[1]] = ipiece
+                ipiece.set_pos(fpoint)
+                self.board_array[ipoint[0]][ipoint[1]] = None
+                return True
+            else:
+                return False
         else:
             return False
 
