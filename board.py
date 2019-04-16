@@ -11,6 +11,7 @@ class Board:
         self.move_history = []
         self.move_dict = {"a": 0, "b": 1, "c": 2, "d": 3, "e": 4, "f": 5, "g": 6, "h": 7, "-": False, "x": True}
         self.turn = 1
+        self.board_state = []
 
     def init_board_array(self):
         temp = [[piece.Rook((0, 0), False, 'r'), piece.Knight((0, 1), False, 'n'), piece.Bishop((0, 2), False, 'b'), piece.King((0, 3), False, 'k'), piece.Queen((0, 4), False, 'q'), piece.Bishop((0, 5), False, 'b'), piece.Knight((0, 6), False, 'n'), piece.Rook((0, 7), False, 'r')],
@@ -70,6 +71,20 @@ class Board:
             return True
         else:
             return False
+
+
+    def get_board_state(self):
+        self.board_state = []
+        for row in self.board_array:
+            for piece in self.board_array[i]:
+                if piece:
+                    if ipiece.get_color() == (self.turn % 2 == 1):
+                        valid_moves = piece.get_valid_moves()
+                        [self.board_state.append(point) for point in valid_moves]
+        return self.board_state
+
+
+
 
     def cap_piece(self, fpiece):
         if fpiece.get_color():
