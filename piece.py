@@ -80,6 +80,7 @@ class Queen(Piece):
         self.follow_path(board_array, (-1,-1))
         return self.valid_moves
 
+
 class Bishop(Piece):
     def __init__(self, pos, color, symbol):
         super().__init__(pos, color, symbol)
@@ -91,15 +92,27 @@ class Bishop(Piece):
         self.follow_path(board_array, (-1,-1))
         return self.valid_moves
 
+
 class Knight(Piece):
     def __init__(self, pos, color, symbol):
         super().__init__(pos, color, symbol)
 
     def get_valid_moves(self, board_array):
-        for i in range(8):
-            for j in range(8):
-                self.valid_moves.append((i, j))
+        template = [(2, 1), (2, -1), (-2, 1), (-2, -1),
+                    (1, 2), (-1, 2), (1, -2), (-1, -2)]
+        i, j = self.pos
+        for point in template:
+            row = i + point[0]
+            col = j + point[1]
+            if row < 8 and row > -1 and col < 8 and col > -1:
+                piece = board_array[row][col]
+                if piece:
+                    if piece.get_color() != self.color:
+                        self.valid_moves.append((row, col))
+                else:
+                    self.valid_moves.append((row, col))
         return self.valid_moves
+
 
 class Rook(Piece):
     def __init__(self, pos, color, symbol):
