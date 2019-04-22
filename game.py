@@ -18,9 +18,9 @@ def main(screen):
             break
         elif b.parse_input(move_str):
             b.inc_turn()
-            win.good_move()
+            # win.good_move()
             # win.display(b)
-            # screen.getch()
+            screen.getch()
             check, checkmate = b.test_check()
             if check:
                 b.undo()

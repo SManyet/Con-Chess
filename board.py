@@ -67,7 +67,7 @@ class Board:
     
     def move_piece(self, ipoint, fpoint, cap):
         ipiece = self.board_array[ipoint[0]][ipoint[1]]
-        if ipiece:
+        if ipiece: 
             valid_moves = []
             if ipiece.get_color():
                 valid_moves = self.white_moves[ipiece]
@@ -112,6 +112,7 @@ class Board:
         
 
     def test_check(self):
+        self.get_all_moves()
         self.check = False
         self.checkmate = False
         if (self.turn - 1) % 2 == 1:
