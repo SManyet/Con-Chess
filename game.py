@@ -1,21 +1,34 @@
 #!/usr/bin/python
 # game.py: functional runner for py-chess
 
-import curses, os, board, window
+import curses, board, window, time
 
 def main(screen):
     win = window.Window(screen)
     b = board.Board()
     game = True
-
     win.display(b)
-    while game:
+    b.get_all_moves()
 
-        move_str = win.input_move().decode("utf-8")
+    while True:
+
+        move_str = win.input_move().decode("utf-8").lower()
         if move_str == "exit":
-            game = win.exit()
+            win.exit()
+            break
         elif b.parse_input(move_str):
             b.inc_turn()
+            win.good_move()
+            # win.display(b)
+            # screen.getch()
+            check, checkmate = b.test_check()
+            if check:
+                b.undo()
+                if checkmate:
+                    # win.checkmate()
+                    pass
+                else:
+                    win.bad_move()
         else:
             win.bad_move()
         

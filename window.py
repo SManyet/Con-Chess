@@ -17,8 +17,9 @@ class Window:
     
 
 
-    ''' Methods for displaying the game to terminal
-            should remain indepent from other processes to assist training speed
+    '''
+    Methods for displaying the game to terminal should remain indepent
+    from other processes to assist training speed
     '''
     def display(self, board):
         board_array = board.get_board_array()
@@ -101,9 +102,15 @@ class Window:
 
     ''' get, set, and other functional methods'''
 
+    # def checkmate(self):
+    #    pass
+
     def bad_move(self):
         self.screen.addstr(15, self.maxcols//2, "invalid input")
     
+    def good_move(self):
+        self.screen.addstr(15, self.maxcols//2, "quality input")
+
     def input_move(self):
         return self.screen.getstr(self.maxlines, 1)
     
