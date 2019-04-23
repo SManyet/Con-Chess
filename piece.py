@@ -64,6 +64,7 @@ class King(Piece):
 
 
     def get_valid_moves(self, board_array):
+        self.valid_moves.clear()
         '''
         TODO: castle and castle through check
         '''
@@ -75,6 +76,7 @@ class Queen(Piece):
         super().__init__(pos, color, symbol)
 
     def get_valid_moves(self, board_array):
+        self.valid_moves.clear()
         self.follow_path(board_array, (1,0))
         self.follow_path(board_array, (-1,0))
         self.follow_path(board_array, (0,1))
@@ -91,6 +93,7 @@ class Bishop(Piece):
         super().__init__(pos, color, symbol)
 
     def get_valid_moves(self, board_array): 
+        self.valid_moves.clear()
         self.follow_path(board_array, (1,1))
         self.follow_path(board_array, (-1,1))
         self.follow_path(board_array, (1,-1))
@@ -105,6 +108,7 @@ class Knight(Piece):
                          (1, 2), (-1, 2), (1, -2), (-1, -2)]
 
     def get_valid_moves(self, board_array):
+        self.valid_moves.clear()
         self.follow_template(board_array, self.template)
         return self.valid_moves
 
@@ -114,6 +118,7 @@ class Rook(Piece):
         super().__init__(pos, color, symbol)
 
     def get_valid_moves(self, board_array):
+        self.valid_moves.clear()
         self.follow_path(board_array, (1, 0))
         self.follow_path(board_array, (-1, 0))
         self.follow_path(board_array, (0, 1))
@@ -125,6 +130,7 @@ class Pawn(Piece):
         super().__init__(pos, color, symbol)
 
     def get_valid_moves(self, board_array):
+        self.valid_moves.clear()
         i, j = self.pos
         offset = None
         if self.color:
@@ -132,7 +138,7 @@ class Pawn(Piece):
         else:
             offset = 1
 
-        for col in (j-1, j, j+1):
+        for col in [j-1, j, j+1]:
             if col > -1 and col < 8:
                 piece = board_array[i+offset][col]
                 if piece:

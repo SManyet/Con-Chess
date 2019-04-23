@@ -113,6 +113,7 @@ class Board:
 
     def test_check(self):
         self.get_all_moves()
+        # breakpoint()
         self.check = False
         self.checkmate = False
         if (self.turn - 1) % 2 == 1:
@@ -121,7 +122,6 @@ class Board:
         else:
             king = self.black_king
             enemy_moves = self.white_moves
-        
         if king:
             # king_moves = king.get_valid_moves(self.board_array)
             king_pos = king.get_pos()
