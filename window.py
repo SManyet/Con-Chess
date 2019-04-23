@@ -109,7 +109,7 @@ class Window:
         self.screen.addstr(15, self.maxcols//2, "invalid input")
     
     def good_move(self):
-        self.screen.addstr(15, self.maxcols//2, "quality input")
+        self.screen.addstr(15, self.maxcols//2, "invalid input")
 
     def input_move(self):
         return self.screen.getstr(self.maxlines, 1)

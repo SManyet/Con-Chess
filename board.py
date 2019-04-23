@@ -84,6 +84,16 @@ class Board:
                 self.board_array[fpoint[0]][fpoint[1]] = ipiece
                 ipiece.set_pos(fpoint)
                 self.board_array[ipoint[0]][ipoint[1]] = None
+                
+                symbol = ipiece.get_symbol()
+                if symbol in ('p', 'P') and fpoint[0] in (0, 8):
+                    if symbol.isupper():
+                        self.board_array[fpoint[0]][fpoint[1]] = piece.Queen(fpoint, ipiece.get_color(), 'Q')
+                    elif symbol.islower():
+                        self.board_array[fpoint[0]][fpoint[1]] = piece.Queen(fpoint, ipiece.get_color(), 'q')
+                    else:
+                        return False
+
                 return True
             else:
                 return False
