@@ -13,20 +13,20 @@ class Board:
         self.turn = 1
         self.white_moves = {}
         self.black_moves = {}
-        self.white_king = self.board_array[7][3]
-        self.black_king = self.board_array[0][3]
+        self.white_king = self.board_array[7][4]
+        self.black_king = self.board_array[0][4]
         self.check = False
         self.checkmate = False
 
     def init_board_array(self):
-        temp = [[piece.Rook((0, 0), False, 'r'), piece.Knight((0, 1), False, 'n'), piece.Bishop((0, 2), False, 'b'), piece.King((0, 3), False, 'k'), piece.Queen((0, 4), False, 'q'), piece.Bishop((0, 5), False, 'b'), piece.Knight((0, 6), False, 'n'), piece.Rook((0, 7), False, 'r')],
+        temp = [[piece.Rook((0, 0), False, 'r'), piece.Knight((0, 1), False, 'n'), piece.Bishop((0, 2), False, 'b'), piece.Queen((0, 3), False, 'q'), piece.King((0, 4), False, 'k'), piece.Bishop((0, 5), False, 'b'), piece.Knight((0, 6), False, 'n'), piece.Rook((0, 7), False, 'r')],
                 [piece.Pawn((1, 0), False, 'p'), piece.Pawn((1, 1), False, 'p'), piece.Pawn((1, 2), False, 'p'), piece.Pawn((1, 3), False, 'p'), piece.Pawn((1, 4), False, 'p'), piece.Pawn((1, 5), False, 'p'), piece.Pawn((1, 6), False, 'p'), piece.Pawn((1, 7), False, 'p')],
                 [None, None, None, None, None, None, None, None],
                 [None, None, None, None, None, None, None, None],
                 [None, None, None, None, None, None, None, None],
                 [None, None, None, None, None, None, None, None],
                 [piece.Pawn((6, 0), True, 'P'), piece.Pawn((6, 1), True, 'P'), piece.Pawn((6, 2), True, 'P'), piece.Pawn((6, 3), True, 'P'), piece.Pawn((6, 4), True, 'P'), piece.Pawn((6, 5), True, 'P'), piece.Pawn((6, 6), True, 'P'), piece.Pawn((6, 7), True, 'P')],
-        [piece.Rook((7, 0), 1, 'R'), piece.Knight((7, 1), True, 'N'), piece.Bishop((7, 2), True, 'B'), piece.King((7, 3), True, 'K'), piece.Queen((7, 4), True, 'Q'), piece.Bishop((7, 5), True, 'B'), piece.Knight((7, 6), True, 'N'), piece.Rook((7, 7), True, 'R')]]
+        [piece.Rook((7, 0), 1, 'R'), piece.Knight((7, 1), True, 'N'), piece.Bishop((7, 2), True, 'B'), piece.Queen((7, 3), True, 'Q'), piece.King((7, 4), True, 'K'), piece.Bishop((7, 5), True, 'B'), piece.Knight((7, 6), True, 'N'), piece.Rook((7, 7), True, 'R')]]
 
         return temp
 
@@ -34,7 +34,11 @@ class Board:
     def parse_input(self, move_str):
         istr, cap, fstr = False, False, False
 
-        if len(move_str) == 5:
+        if move_str == "0-0":
+            return self.castle_king()
+        elif move_str == "0-0-0":
+            return self.castle_queen()
+        elif len(move_str) <= 5:
             istr = self.eval_pos(move_str[:2])
             cap = (move_str[2] in ('x', 'X'))
             fstr = self.eval_pos(move_str[3:])
@@ -83,6 +87,7 @@ class Board:
                         self.cap_piece(fpiece)
                 self.board_array[fpoint[0]][fpoint[1]] = ipiece
                 ipiece.set_pos(fpoint)
+                ipiece.inc_move_count()
                 self.board_array[ipoint[0]][ipoint[1]] = None
                 
                 symbol = ipiece.get_symbol()
@@ -165,6 +170,47 @@ class Board:
         if fpiece:
             fpiece.set_pos(fpoint)
 
+
+
+    def castle_king(self):
+        king = None
+        rook = None
+        row = 0
+        enemy_moves = None
+        if self.turn % 2 == 1:
+            king = self.white_king
+            row = 7
+            enemy_moves = self.black_moves
+        else:
+            king = self.black_king
+            enemy_moves = self.white_moves
+        rook = self.board_array[row][7]
+
+        if rook and rook.get_move_count() == 0 and king.get_move_count() == 0:
+            for col in range(5, 8):
+                piece = self.board_array[row][col]
+                if piece not in (rook, None):
+                    return False
+                for move_list in enemy_moves.values():
+                    if (row, col) in move_list:
+                        return False
+            self.board_array[row][5] = rook
+            rook.set_pos((row, 5))
+            rook.inc_move_count()
+            self.board_array[row][6] = king
+            king.set_pos((row, 6))
+            king.inc_move_count()
+            self.board_array[row][4] = None
+            self.board_array[row][7] = None
+            return True
+        else:
+            return False
+
+
+
+
+    def castle_queen(self):
+        return False
 
 
     def get_checkmate(self):
