@@ -15,7 +15,7 @@ class Piece:
         while True:
             row = i+count*di
             col = j+count*dj
-            if row > -1 and row < 8 and col > -1 and col < 8:
+            if -1 < row < 8 and -1 < col < 8:
                 piece = board_array[row][col]
                 if piece:
                     if piece.get_color() != self.color:
@@ -34,7 +34,7 @@ class Piece:
         for point in template:
             row = i + point[0]
             col = j + point[1]
-            if row < 8 and row > -1 and col < 8 and col > -1:
+            if -1 < row < 8 and -1 < col < 8:
                 piece = board_array[row][col]
                 if piece:
                     if piece.get_color() != self.color:
@@ -139,7 +139,7 @@ class Pawn(Piece):
             offset = 1
 
         for col in [j-1, j, j+1]:
-            if col > -1 and col < 8:
+            if -1 < col < 8:
                 piece = board_array[i+offset][col]
                 if piece:
                     if col != j:

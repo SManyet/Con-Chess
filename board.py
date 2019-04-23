@@ -113,7 +113,6 @@ class Board:
 
     def test_check(self):
         self.get_all_moves()
-        # breakpoint()
         self.check = False
         self.checkmate = False
         if (self.turn - 1) % 2 == 1:
