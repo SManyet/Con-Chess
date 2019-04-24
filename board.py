@@ -187,9 +187,9 @@ class Board:
         rook = self.board_array[row][7]
 
         if rook and rook.get_move_count() == 0 and king.get_move_count() == 0:
-            for col in range(5, 8):
+            for col in (4, 5, 6):
                 piece = self.board_array[row][col]
-                if piece not in (rook, None):
+                if piece not in (king, None):
                     return False
                 for move_list in enemy_moves.values():
                     if (row, col) in move_list:
@@ -207,10 +207,43 @@ class Board:
             return False
 
 
-
-
     def castle_queen(self):
-        return False
+        king = None
+        rook = None
+        row = 0
+        enemy_moves = None
+        if self.turn % 2 == 1:
+            king = self.white_king
+            row = 7
+            enemy_moves = self.black_moves
+        else:
+            king = self.black_king
+            enemy_moves = self.white_moves
+        rook = self.board_array[row][0]
+
+        if rook and rook.get_move_count() == 0 and king.get_move_count() == 0:
+            for col in (1, 2, 3, 4):
+                piece = self.board_array[row][col]
+                if piece not in (king, None):
+                    return False
+                for move_list in enemy_moves.values():
+                    if (row, col) in move_list:
+                        return False
+            self.board_array[row][3] = rook
+            rook.set_pos((row, 3))
+            rook.inc_move_count()
+            self.board_array[row][2] = king
+            king.set_pos((row, 2))
+            king.inc_move_count()
+            self.board_array[row][4] = None
+            self.board_array[row][0] = None
+            return True
+        else:
+            return False
+
+
+
+
 
 
     def get_checkmate(self):

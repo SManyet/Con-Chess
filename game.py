@@ -27,7 +27,6 @@ def main(screen):
                     pass
                 else:
                     win.bad_move()
-                    x = 5/0
         else:
             win.bad_move()
         
