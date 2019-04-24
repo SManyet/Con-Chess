@@ -1,7 +1,7 @@
 #!/usr/bin/python
 # game.py: functional runner for py-chess
 
-import curses, board, window, time
+import curses, board, window
 
 def main(screen):
     win = window.Window(screen)
