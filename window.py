@@ -2,8 +2,6 @@
 # window.py: class file for managing display with curses
 
 import curses
-# import board
-from curses.textpad import rectangle
 
 class Window:
     def __init__(self, screen):
@@ -102,8 +100,9 @@ class Window:
 
     ''' get, set, and other functional methods'''
 
-    # def checkmate(self):
-    #    pass
+    def checkmate(self):
+        self.screen.addstr(15, self.maxcols//2, "Checkmate    ")
+        self.exit()
 
     def bad_move(self):
         self.screen.addstr(15, self.maxcols//2, "invalid input")
@@ -118,4 +117,3 @@ class Window:
         self.screen.addstr(self.maxlines - 1, 1, "press ENTER to exit")
         self.screen.getch()
         curses.endwin()
-        return False

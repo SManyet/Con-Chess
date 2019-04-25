@@ -6,7 +6,6 @@ import curses, board, window
 def main(screen):
     win = window.Window(screen)
     b = board.Board()
-    game = True
     win.display(b)
     b.get_all_moves()
 
@@ -19,14 +18,14 @@ def main(screen):
         elif b.parse_input(move_str):
             b.inc_turn()
             win.good_move()
-            check, checkmate = b.test_check()
-            if check:
-                b.undo()
-                if checkmate:
-                    # win.checkmate()
-                    pass
+            if b.test_check():
+                if b.test_mate():
+                    win.checkmate()
+                    break
                 else:
+                    b.undo()
                     win.bad_move()
+
         else:
             win.bad_move()
         

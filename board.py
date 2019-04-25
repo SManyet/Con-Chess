@@ -2,19 +2,26 @@
 # board.py: class to hold abstraction of the chess board
 
 import piece
+from node import Node
 
 class Board:
-    def __init__(self):
-        self.board_array = self.init_board_array()
-        self.white_cap = []
-        self.black_cap = []
-        self.move_history = []
+    def __init__(self, board_array=None, turn=1, white_cap=[], black_cap=[], move_history=[], white_king=None, black_king=None):
+        if board_array:
+            self.board_array = board_array
+        else:
+            self.board_array = self.init_board_array()
+        self.white_cap = white_cap
+        self.black_cap = black_cap
+        self.move_history = move_history
         self.move_dict = {"a": 0, "b": 1, "c": 2, "d": 3, "e": 4, "f": 5, "g": 6, "h": 7, "-": False, "x": True}
-        self.turn = 1
+        self.turn = turn
         self.white_moves = {}
         self.black_moves = {}
-        self.white_king = self.board_array[7][4]
-        self.black_king = self.board_array[0][4]
+        if white_king and black_king:
+            self.white_king, self.black_king = white_king, black_king
+        else:
+            self.white_king = self.board_array[7][4]
+            self.black_king = self.board_array[0][4]
         self.check = False
         self.checkmate = False
 
@@ -38,9 +45,9 @@ class Board:
             return self.castle_king()
         elif move_str == "0-0-0":
             return self.castle_queen()
-        elif len(move_str) <= 5:
+        elif len(move_str) == 5:
             istr = self.eval_pos(move_str[:2])
-            cap = (move_str[2] in ('x', 'X'))
+            cap = (move_str[2] == 'x')
             fstr = self.eval_pos(move_str[3:])
             if not istr or not fstr:
                 return False
@@ -98,6 +105,11 @@ class Board:
                         self.board_array[fpoint[0]][fpoint[1]] = piece.Queen(fpoint, ipiece.get_color(), 'q')
                     else:
                         return False
+                elif symbol in ('k', 'K'):
+                    if symbol.isupper():
+                        self.white_king = ipiece
+                    else:
+                        self.black_king = ipiece
 
                 return True
             else:
@@ -129,7 +141,6 @@ class Board:
     def test_check(self):
         self.get_all_moves()
         self.check = False
-        self.checkmate = False
         if (self.turn - 1) % 2 == 1:
             king = self.white_king
             enemy_moves = self.black_moves
@@ -137,17 +148,11 @@ class Board:
             king = self.black_king
             enemy_moves = self.white_moves
         if king:
-            # king_moves = king.get_valid_moves(self.board_array)
             king_pos = king.get_pos()
             for move_list in enemy_moves.values():
                 if king_pos in move_list:
-                    self.check = True
-                # king_moves = [move for move in king_moves if move not in move_list]
-                # if self.check and len(king_moves) == 0:
-                #     self.checkmate = True
-        
-        return self.check, self.checkmate
-
+                    self.check = True 
+        return self.check
 
     def undo(self):
         self.turn -= 1
@@ -246,8 +251,9 @@ class Board:
 
 
 
-    def get_checkmate(self):
-        return self.checkmate
+    def test_mate(self):
+        node = Node(self)
+        return node.test_mate()
     
     def get_board_array(self):
         return self.board_array
