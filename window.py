@@ -8,6 +8,7 @@ class Window:
         self.screen = screen
         self.maxlines = curses.LINES - 1
         self.maxcols = curses.COLS - 1
+        self.move_dict = {"a": 0, "b": 1, "c": 2, "d": 3, "e": 4, "f": 5, "g": 6, "h": 7}
 
         screen.clear()
         curses.cbreak()
@@ -96,9 +97,55 @@ class Window:
         self.screen.addstr(0, 36, str(turn))
 
     
+    def parse_input(self, move_str):
+        if move_str == "exit":
+            return "exit"
+        if move_str == "0-0-0":
+            return move_str 
+        elif move_str == "0-0":
+            return move_str
+        elif len(move_str) == 5:
+            istr = self.eval_pos(move_str[:2])
+            # cap = (move_str[2] == 'x')
+            fstr = self.eval_pos(move_str[3:])
+            if not istr or not fstr:
+                return False
+            else:
+                ipoint = self.trans_rank_file(istr)
+                fpoint = self.trans_rank_file(fstr)
+            if ipoint and fpoint:
+                return [ipoint, fpoint]
+            else:
+                return False
+        else:
+            return False
+
+
+    def eval_pos(self, pos):
+        if ord(pos[0]) > 104 or ord(pos[0]) < 97:
+            return False
+        elif ord(pos[1]) > 56 or ord(pos[1]) < 49:
+            return False
+        else:
+            return pos
+
+
+    def trans_rank_file(self, rank_file):
+        findex = 8 - int(rank_file[1])
+        rindex = self.move_dict[rank_file[0]]
+        return (findex, rindex)
+
+
+
+
+
+
 
 
     ''' get, set, and other functional methods'''
+
+    def check(self):
+        self.screen.addstr(15, self.maxcols//2, "Check        ")
 
     def checkmate(self):
         self.screen.addstr(15, self.maxcols//2, "Checkmate    ")
@@ -111,9 +158,11 @@ class Window:
         self.screen.addstr(15, self.maxcols//2, "valid input  ")
 
     def input_move(self):
-        return self.screen.getstr(self.maxlines, 1)
+        move_str = self.screen.getstr(self.maxlines, 1).decode("utf-8").lower()
+        return self.parse_input(move_str)
     
     def exit(self):
         self.screen.addstr(self.maxlines - 1, 1, "press ENTER to exit")
         self.screen.getch()
+        self.screen.refresh()
         curses.endwin()

@@ -2,7 +2,6 @@
 # board.py: class to hold abstraction of the chess board
 
 import piece
-from node import Node
 
 class Board:
     def __init__(self, board_array=None, turn=1, white_cap=[], black_cap=[], move_history=[], white_king=None, black_king=None):
@@ -37,83 +36,39 @@ class Board:
 
         return temp
 
-
-    def parse_input(self, move_str):
-        istr, cap, fstr = False, False, False
-
-        if move_str == "0-0":
-            return self.castle_king()
-        elif move_str == "0-0-0":
-            return self.castle_queen()
-        elif len(move_str) == 5:
-            istr = self.eval_pos(move_str[:2])
-            cap = (move_str[2] == 'x')
-            fstr = self.eval_pos(move_str[3:])
-            if not istr or not fstr:
-                return False
-            else:
-                ipoint = self.trans_rank_file(istr)
-                fpoint = self.trans_rank_file(fstr)
-
-            if self.move_piece(ipoint, fpoint, cap):
-                self.move_history.append(move_str)
-                return True
-            else:
-                return False
-
-
-    def eval_pos(self, pos):
-        if ord(pos[0]) > 104 or ord(pos[0]) < 97:
-            return False
-        elif ord(pos[1]) > 56 or ord(pos[1]) < 49:
-            return False
-        else:
-            return pos
-
-
-    def trans_rank_file(self, rank_file):
-        findex = 8 - int(rank_file[1])
-        rindex = self.move_dict[rank_file[0]]
-        return (findex, rindex)
     
-    def move_piece(self, ipoint, fpoint, cap):
-        ipiece = self.board_array[ipoint[0]][ipoint[1]]
-        if ipiece: 
-            valid_moves = []
-            if ipiece.get_color():
-                valid_moves = self.white_moves[ipiece]
-            else:
-                valid_moves = self.black_moves[ipiece]
+    def move_piece(self, ipoint, fpoint):
+        if ipoint == "0-0-0":
+            return False     
+        elif ipoint == "0-0":
+            return False
+        elif ipoint and fpoint:
+            ipiece = self.board_array[ipoint[0]][ipoint[1]]
+            fpiece = self.board_array[fpoint[0]][fpoint[1]]
+            if fpiece:
+                if fpiece.get_symbol() in ('k', 'K'):
+                    return False
+                else:
+                    self.cap_piece(fpiece)
+            self.board_array[fpoint[0]][fpoint[1]] = ipiece
+            ipiece.set_pos(fpoint)
+            ipiece.inc_move_count()
+            self.board_array[ipoint[0]][ipoint[1]] = None
+     
+            symbol = ipiece.get_symbol()
+            if symbol in ('p', 'P') and fpoint[0] in (0, 8):
+                if symbol.isupper():
+                    self.board_array[fpoint[0]][fpoint[1]] = piece.Queen(fpoint, ipiece.get_color(), 'Q')
+                elif symbol.islower():
+                    self.board_array[fpoint[0]][fpoint[1]] = piece.Queen(fpoint, ipiece.get_color(), 'q')
+            elif symbol in ('k', 'K'):
+                if symbol.isupper():
+                    self.white_king = ipiece
+                else:
+                    self.black_king = ipiece
 
-            if ipiece.get_color() == (self.turn % 2 == 1) and fpoint in valid_moves:
-                fpiece = self.board_array[fpoint[0]][fpoint[1]]
-                if fpiece:
-                    if not cap or fpiece.get_symbol() in ('k', 'K'):
-                        return False
-                    else:
-                        self.cap_piece(fpiece)
-                self.board_array[fpoint[0]][fpoint[1]] = ipiece
-                ipiece.set_pos(fpoint)
-                ipiece.inc_move_count()
-                self.board_array[ipoint[0]][ipoint[1]] = None
-                
-                symbol = ipiece.get_symbol()
-                if symbol in ('p', 'P') and fpoint[0] in (0, 8):
-                    if symbol.isupper():
-                        self.board_array[fpoint[0]][fpoint[1]] = piece.Queen(fpoint, ipiece.get_color(), 'Q')
-                    elif symbol.islower():
-                        self.board_array[fpoint[0]][fpoint[1]] = piece.Queen(fpoint, ipiece.get_color(), 'q')
-                    else:
-                        return False
-                elif symbol in ('k', 'K'):
-                    if symbol.isupper():
-                        self.white_king = ipiece
-                    else:
-                        self.black_king = ipiece
-
-                return True
-            else:
-                return False
+            self.inc_turn()
+            return True
         else:
             return False
 
@@ -136,12 +91,14 @@ class Board:
                         self.white_moves[piece] = piece.get_valid_moves(self.board_array)
                     else:
                         self.black_moves[piece] = piece.get_valid_moves(self.board_array)
+        self.white_moves.update(self.black_moves)
+        return self.white_moves
         
 
-    def test_check(self):
+    def test_check(self, offset):
         self.get_all_moves()
         self.check = False
-        if (self.turn - 1) % 2 == 1:
+        if (self.turn - offset) % 2 == 1:
             king = self.white_king
             enemy_moves = self.black_moves
         else:
@@ -177,6 +134,9 @@ class Board:
 
 
 
+    def test_castle(self):
+        return self.castle_queen, self.castle_king
+
     def castle_king(self):
         king = None
         rook = None
@@ -199,14 +159,6 @@ class Board:
                 for move_list in enemy_moves.values():
                     if (row, col) in move_list:
                         return False
-            self.board_array[row][5] = rook
-            rook.set_pos((row, 5))
-            rook.inc_move_count()
-            self.board_array[row][6] = king
-            king.set_pos((row, 6))
-            king.inc_move_count()
-            self.board_array[row][4] = None
-            self.board_array[row][7] = None
             return True
         else:
             return False
@@ -234,14 +186,6 @@ class Board:
                 for move_list in enemy_moves.values():
                     if (row, col) in move_list:
                         return False
-            self.board_array[row][3] = rook
-            rook.set_pos((row, 3))
-            rook.inc_move_count()
-            self.board_array[row][2] = king
-            king.set_pos((row, 2))
-            king.inc_move_count()
-            self.board_array[row][4] = None
-            self.board_array[row][0] = None
             return True
         else:
             return False
@@ -250,10 +194,6 @@ class Board:
 
 
 
-
-    def test_mate(self):
-        node = Node(self)
-        return node.test_mate()
     
     def get_board_array(self):
         return self.board_array

@@ -1,34 +1,37 @@
 #!/usr/bin/python
 # game.py: functional runner for py-chess
 
-import curses, board, window
+import curses
+from window import Window
+from node import Node
 
 def main(screen):
-    win = window.Window(screen)
-    b = board.Board()
-    win.display(b)
-    b.get_all_moves()
+    window = Window(screen)
+    node = Node()
+    window.display(node.current_board)
 
     while True:
-
-        move_str = win.input_move().decode("utf-8").lower()
-        if move_str == "exit":
-            win.exit()
+        node.gen_children()
+        if len(node.child_nodes) == 0:
+            window.checkmate()
             break
-        elif b.parse_input(move_str):
-            b.inc_turn()
-            win.good_move()
-            if b.test_check():
-                if b.test_mate():
-                    win.checkmate()
-                    break
+        move = window.input_move()
+        if move == "exit":
+            window.exit()
+            break
+        elif move:
+            child = node.get_child(move)
+            if child:
+                node = child
+                if child.check:
+                    window.check()
                 else:
-                    b.undo()
-                    win.bad_move()
-
+                    window.good_move()
+            else:
+                window.bad_move()
         else:
-            win.bad_move()
+            window.bad_move()
         
-        win.display(b)
+        window.display(node.current_board)
 
 curses.wrapper(main)

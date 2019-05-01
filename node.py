@@ -2,44 +2,59 @@
 # class for implementing move and Node generation
 
 from copy import deepcopy
-import board
+from board import Board
 
 class Node:
-    def __init__(self, current_board, parent_move=None, weight=None):
+    def __init__(self, current_board=Board(), parent_move=None, node_weight=0, check=False):
         self.current_board = current_board
         self.parent_move = parent_move
-        self.weight = weight
-        self.child_nodes = self.gen_children()
-
-    
+        self.node_weight = node_weight
+        self.child_nodes = {}
+        self.check = check
 
     def gen_children(self):
-        child_nodes = []
-        if self.current_board.turn % 2 == 0:
-            child_moves = self.current_board.white_moves
-        else:
-            child_moves = self.current_board.black_moves
+        valid_moves = self.current_board.get_all_moves()
+        for ipiece, move_list in valid_moves.items():
+            if ipiece.get_color() == (self.current_board.turn % 2 == 1):
+                ipoint = ipiece.get_pos()
+                if ipiece.get_symbol() in ('k', 'K'):
+                    queen_castle, king_castle = self.current_board.test_castle()
+                    if queen_castle:
+                        move_list.append("0-0-0")
+                    if king_castle:
+                        move_list.append("0-0")
+                for fpoint in move_list:
+                    child_board = deepcopy(self.current_board)
+                    if fpoint == "0-0":
+                        weight = 0
+                        i, j = ipoint
+                        child_board.move_piece(ipoint, (i, 6))
+                        child_board.move_piece((i, 7), (i, 5))
+                        child_move = fpoint
+                    elif fpoint == "0-0-0":
+                        weight = 0
+                        i, j = ipoint
+                        child_board.move_piece(ipoint, (i, 2))
+                        child_board.move_piece((i, 0), (i, 3))
+                        child_move = fpoint
+                    else:
+                        child_move = [ipoint, fpoint]
+                        weight = child_board.move_piece(ipoint, fpoint)
+                    if weight and not child_board.test_check(1):
+                        if child_board.test_check(0): 
+                            self.child_nodes[str(child_move)] = Node(current_board=child_board,
+                                                                     parent_move=child_move,
+                                                                     node_weight=weight+10,
+                                                                     check=True)
+                        else:
+                            self.child_nodes[str(child_move)] = Node(current_board=child_board,
+                                                                     parent_move=child_move,
+                                                                     node_weight=weight)
 
-        current_board = deepcopy(self.current_board)
-        for piece, move_list in child_moves.items():
-            ipoint = piece.get_pos()
-            for fpoint in move_list:
-                fpiece = current_board.board_array[fpoint[0]][fpoint[1]]
-                cap = False
-                if fpiece:
-                    cap = True
-                if current_board.move_piece(ipoint, fpoint, cap):
-                    current_board.inc_turn()
-                    if not current_board.test_check():
-                        child_board = board.Board(board_array=current_board.board_array,
-                                            turn=current_board.turn,
-                                            white_king=current_board.white_king,
-                                            black_king=current_board.black_king)
-                        child_nodes.append(Node(child_board, parent_move=[ipoint, fpoint], weight=0))
-                else:
-                    continue
-                current_board = deepcopy(self.current_board)
-        return child_nodes
-
-    def test_mate(self):
-        return len(self.child_nodes) == 0
+                        
+    def get_child(self, move):
+            try:
+                child = self.child_nodes[str(move)]
+            except:
+                return False
+            return child

@@ -61,12 +61,16 @@ class Piece:
 
     def get_symbol(self):
         return self.symbol
+    
+    def get_value(self):
+        return self.value
 
 class King(Piece):
     def __init__(self, pos, color, symbol):
         super().__init__(pos, color, symbol)
         self.template = [(1, 1), (1, 0), (1, -1), (-1, -1),
                          (-1, 0), (-1, 1), (0, 1), (0, -1)]
+        self.value = 0
 
 
     def get_valid_moves(self, board_array):
@@ -77,6 +81,10 @@ class King(Piece):
 class Queen(Piece):
     def __init__(self, pos, color, symbol):
         super().__init__(pos, color, symbol)
+        if self.color:
+            self.value = 9
+        else:
+            self.value = -9
 
     def get_valid_moves(self, board_array):
         self.valid_moves.clear()
@@ -94,6 +102,10 @@ class Queen(Piece):
 class Bishop(Piece):
     def __init__(self, pos, color, symbol):
         super().__init__(pos, color, symbol)
+        if self.color:
+            self.value = 3
+        else:
+            self.value = -3
 
     def get_valid_moves(self, board_array): 
         self.valid_moves.clear()
@@ -109,6 +121,10 @@ class Knight(Piece):
         super().__init__(pos, color, symbol)
         self.template = [(2, 1), (2, -1), (-2, 1), (-2, -1),
                          (1, 2), (-1, 2), (1, -2), (-1, -2)]
+        if self.color:
+            self.value = 3
+        else:
+            self.value = -3
 
     def get_valid_moves(self, board_array):
         self.valid_moves.clear()
@@ -119,6 +135,10 @@ class Knight(Piece):
 class Rook(Piece):
     def __init__(self, pos, color, symbol):
         super().__init__(pos, color, symbol)
+        if self.color:
+            self.value = 5
+        else:
+            self.value = -5
 
     def get_valid_moves(self, board_array):
         self.valid_moves.clear()
@@ -131,6 +151,10 @@ class Rook(Piece):
 class Pawn(Piece):
     def __init__(self, pos, color, symbol):
         super().__init__(pos, color, symbol)
+        if self.color:
+            self.value = 1
+        else:
+            self.value = -1
 
     def get_valid_moves(self, board_array):
         self.valid_moves.clear()
