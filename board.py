@@ -39,9 +39,6 @@ class Board:
     def move_piece(self, ipoint, fpoint):
         if ipoint and fpoint:
             ipiece = self.board_array[ipoint[0]][ipoint[1]]
-            if not ipiece:
-                time.sleep(5)
-                breakpoint()
             fpiece = self.board_array[fpoint[0]][fpoint[1]]
             if fpiece:
                 if fpiece.get_symbol() in ('k', 'K'):
