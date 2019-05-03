@@ -25,7 +25,6 @@ class Window:
         
         self.board_display(board_array)
         self.cap_display(board.get_white_cap(), board.get_black_cap())
-        self.move_display(board.get_move_history())
         self.turn_display(board.get_turn())
 
         self.screen.addstr(self.maxlines, 1, "                      ")
@@ -62,7 +61,6 @@ class Window:
         black_index = 0
         for c in range(40, 47):
             for l in range(13):
-                # self.screen.addch(l, c, '#')
                 if c == 40 or c == 43 or c == 46:
                     self.screen.addch(l, c, "|")
                 elif l == 0 or l == 2 or l == 12:
@@ -80,18 +78,6 @@ class Window:
 
         self.screen.addch(1, 41, 'W')
         self.screen.addch(1, 44, 'B')
-    
-
-    def move_display(self, move_history):
-        index = 0
-        for c in range(49, 65):
-            for l in range(13):
-                if c == 49 or c == 64:
-                    self.screen.addch(l, c, '|')
-                elif l == 0 or l == 12:
-                    self.screen.addch(l, c, '-')
-                elif l > 0 and l - 1 < len(move_history):
-                    self.screen.addstr(l, 50, move_history[len(move_history) - l])
 
     def turn_display(self, turn):
         self.screen.addstr(0, 36, str(turn))
@@ -106,7 +92,6 @@ class Window:
             return move_str
         elif len(move_str) == 5:
             istr = self.eval_pos(move_str[:2])
-            # cap = (move_str[2] == 'x')
             fstr = self.eval_pos(move_str[3:])
             if not istr or not fstr:
                 return False
@@ -146,6 +131,10 @@ class Window:
 
     def check(self):
         self.screen.addstr(15, self.maxcols//2, "Check        ")
+
+    def draw(self):
+        self.screen.addstr(15, self.maxcols//2, "Draw         ")
+        self.screen.refresh()
 
     def checkmate(self):
         self.screen.addstr(15, self.maxcols//2, "Checkmate    ")

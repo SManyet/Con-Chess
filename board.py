@@ -2,6 +2,7 @@
 # board.py: class to hold abstraction of the chess board
 
 import piece
+import time
 
 class Board:
     def __init__(self, board_array=None, turn=1, white_cap=[], black_cap=[], move_history=[], white_king=None, black_king=None):
@@ -11,7 +12,6 @@ class Board:
             self.board_array = self.init_board_array()
         self.white_cap = white_cap
         self.black_cap = black_cap
-        self.move_history = move_history
         self.move_dict = {"a": 0, "b": 1, "c": 2, "d": 3, "e": 4, "f": 5, "g": 6, "h": 7, "-": False, "x": True}
         self.turn = turn
         self.white_moves = {}
@@ -21,8 +21,7 @@ class Board:
         else:
             self.white_king = self.board_array[7][4]
             self.black_king = self.board_array[0][4]
-        self.check = False
-        self.checkmate = False
+
 
     def init_board_array(self):
         temp = [[piece.Rook((0, 0), False, 'r'), piece.Knight((0, 1), False, 'n'), piece.Bishop((0, 2), False, 'b'), piece.Queen((0, 3), False, 'q'), piece.King((0, 4), False, 'k'), piece.Bishop((0, 5), False, 'b'), piece.Knight((0, 6), False, 'n'), piece.Rook((0, 7), False, 'r')],
@@ -38,12 +37,11 @@ class Board:
 
     
     def move_piece(self, ipoint, fpoint):
-        if ipoint == "0-0-0":
-            return False     
-        elif ipoint == "0-0":
-            return False
-        elif ipoint and fpoint:
+        if ipoint and fpoint:
             ipiece = self.board_array[ipoint[0]][ipoint[1]]
+            if not ipiece:
+                time.sleep(5)
+                breakpoint()
             fpiece = self.board_array[fpoint[0]][fpoint[1]]
             if fpiece:
                 if fpiece.get_symbol() in ('k', 'K'):
@@ -56,12 +54,7 @@ class Board:
             self.board_array[ipoint[0]][ipoint[1]] = None
      
             symbol = ipiece.get_symbol()
-            if symbol in ('p', 'P') and fpoint[0] in (0, 8):
-                if symbol.isupper():
-                    self.board_array[fpoint[0]][fpoint[1]] = piece.Queen(fpoint, ipiece.get_color(), 'Q')
-                elif symbol.islower():
-                    self.board_array[fpoint[0]][fpoint[1]] = piece.Queen(fpoint, ipiece.get_color(), 'q')
-            elif symbol in ('k', 'K'):
+            if symbol in ('k', 'K'):
                 if symbol.isupper():
                     self.white_king = ipiece
                 else:
@@ -81,18 +74,12 @@ class Board:
     
 
     def get_all_moves(self):
-        self.white_moves.clear()
-        self.black_moves.clear()
-
+        all_moves = {}
         for row in self.board_array:
             for piece in row:
                 if piece:
-                    if piece.get_color():
-                        self.white_moves[piece] = piece.get_valid_moves(self.board_array)
-                    else:
-                        self.black_moves[piece] = piece.get_valid_moves(self.board_array)
-        self.white_moves.update(self.black_moves)
-        return self.white_moves
+                    all_moves[piece] = piece.get_valid_moves(self.board_array)
+        return all_moves
         
 
     def test_check(self, offset):
@@ -111,36 +98,22 @@ class Board:
                     self.check = True 
         return self.check
 
-    def undo(self):
-        self.turn -= 1
-        move_str = self.move_history.pop()
-        ipoint = self.trans_rank_file(move_str[:2])
-        fpoint = self.trans_rank_file(move_str[3:])
-        cap = (move_str[2] in ('x', 'X'))
-
-        ipiece = self.board_array[fpoint[0]][fpoint[1]]
-        self.board_array[ipoint[0]][ipoint[1]] = ipiece
-        ipiece.set_pos(ipoint)
-        fpiece = None
-        if cap:
-            if ipiece.get_color():
-                fpiece = self.white_cap.pop()
-            else:
-                fpiece = self.black_cap.pop()
-                
-        self.board_array[fpoint[0]][fpoint[1]] = fpiece
-        if fpiece:
-            fpiece.set_pos(fpoint)
 
 
+    def test_draw(self):
+        for row in self.board_array:
+            for piece in row:
+                if piece and piece.get_symbol() not in ('k', 'K', 'b', 'B'):
+                    return False
+        return True
+                        
 
     def test_castle(self):
-        return self.castle_queen, self.castle_king
+        return self.castle_queen(), self.castle_king()
 
     def castle_king(self):
         king = None
         rook = None
-        row = 0
         enemy_moves = None
         if self.turn % 2 == 1:
             king = self.white_king
@@ -148,6 +121,7 @@ class Board:
             enemy_moves = self.black_moves
         else:
             king = self.black_king
+            row = 0
             enemy_moves = self.white_moves
         rook = self.board_array[row][7]
 
@@ -203,9 +177,6 @@ class Board:
 
     def get_black_cap(self): 
         return self.black_cap
-
-    def get_move_history(self):
-        return self.move_history
 
     def inc_turn(self):
         self.turn += 1
