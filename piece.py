@@ -1,6 +1,8 @@
 #!/usr/bin/python
 # piece.py: an abstract piece object to be implemented for each piece type
 
+import time
+
 class Piece:
     def __init__(self, pos, color, symbol):
         self.pos = pos

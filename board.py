@@ -2,7 +2,6 @@
 # board.py: class to hold abstraction of the chess board
 
 import piece
-import time
 
 class Board:
     def __init__(self, board_array=None, turn=1, white_cap=[], black_cap=[], move_history=[], white_king=None, black_king=None):

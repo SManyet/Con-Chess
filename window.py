@@ -20,6 +20,43 @@ class Window:
     Methods for displaying the game to terminal should remain indepent
     from other processes to assist training speed
     '''
+    def settings(self):
+        return self.player(1), self.player(2), self.node_type()
+
+    def player(self, i):
+        self.screen.addstr(self.maxlines - 1, 1, "Player {}: human, random, minimax [depth]".format(i))
+        player_str = self.screen.getstr(self.maxlines, 1).decode("utf-8").lower()
+        self.screen.refresh()
+        self.screen.clear()
+        if "human" in player_str:
+            return "human"
+        elif "random" in player_str:
+            return "random"
+        elif "minimax " in player_str:
+            return "minimax"
+        else:
+            return False
+
+    def node_type(self):
+        self.screen.addstr(self.maxlines - 1, 1, "Node Type: serial, concurrent, or hybrid"
+                )
+        node_type = self.screen.getstr(self.maxlines, 1).decode("utf-8").lower()
+        self.screen.refresh()
+        self.screen.clear()
+        if "serial" in node_type:
+            return "serial"
+        elif "concurrent" in node_type:
+            return "concurrent"
+        elif "hybrid" in node_type:
+            return "hybrid"
+        else:
+            return False
+
+
+
+
+
+
     def display(self, board):
         board_array = board.get_board_array()
         
