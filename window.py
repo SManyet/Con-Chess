@@ -32,7 +32,7 @@ class Window:
             return "human"
         elif "random" in player_str:
             return "random"
-        elif "minimax " in player_str:
+        elif "minimax" in player_str:
             return "minimax"
         else:
             return False
@@ -171,7 +171,7 @@ class Window:
 
     def draw(self):
         self.screen.addstr(15, self.maxcols//2, "Draw         ")
-        self.screen.refresh()
+        self.exit()
 
     def checkmate(self):
         self.screen.addstr(15, self.maxcols//2, "Checkmate    ")

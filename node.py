@@ -7,17 +7,19 @@ from piece import Queen
 import multiprocessing
 
 class SerialNode:
-    def __init__(self, current_board=Board(), parent_move=None, node_weight=0, check=False):
+    def __init__(self, current_board=Board(), move_history=[], weight=0, check=False):
         self.current_board = current_board
-        self.parent_move = parent_move
-        self.node_weight = node_weight
+        self.move_history = move_history
+        self.weight = weight
         self.child_nodes = {}
         self.check = check
+        self.offset = {True: 1, False:-1}
 
     def gen_children(self):
         valid_moves = self.current_board.get_all_moves()
         for ipiece, move_list in valid_moves.items():
             if ipiece.get_color() == (self.current_board.turn % 2 == 1):
+                offset = self.offset[ipiece.get_color()]
                 ipoint = ipiece.get_pos()
                 symbol = ipiece.get_symbol()
                 if symbol in ('k', 'K'):
@@ -29,13 +31,13 @@ class SerialNode:
                 for fpoint in move_list:
                     child_board = deepcopy(self.current_board)
                     if fpoint == "0-0": 
-                        weight = 0
+                        weight = offset * 8
                         i, j = ipoint
                         child_board.move_piece(ipoint, (i, 6))
                         child_board.move_piece((i, 7), (i, 5))
                         child_move = fpoint
                     elif fpoint == "0-0-0":
-                        weight = 0
+                        weight = offset * 8
                         i, j = ipoint
                         child_board.move_piece(ipoint, (i, 2))
                         child_board.move_piece((i, 0), (i, 3))
@@ -47,21 +49,21 @@ class SerialNode:
                         else:
                             child_board.board_array[fpoint[0]][fpoint[1]] = Queen((fpoint[0], fpoint[1]), True, 'Q')
                         child_board.inc_turn()
-                        weight = 100
-                        child_move = [ipoint, fpoint]
+                        weight = offset * 10
+                        child_move = str([ipoint, fpoint])
                     else:
-                        child_move = [ipoint, fpoint]
+                        child_move = str([ipoint, fpoint])
                         weight = child_board.move_piece(ipoint, fpoint)
                     if weight and not child_board.test_check(1):
                         if child_board.test_check(0): 
-                            self.child_nodes[str(child_move)] = SerialNode(current_board=child_board,
-                                                                     parent_move=child_move,
-                                                                     node_weight=weight+10,
+                            self.child_nodes[child_move] = SerialNode(current_board=child_board,
+                                                                     move_history=self.move_history+[child_move],
+                                                                     weight=weight,
                                                                      check=True)
                         else:
-                            self.child_nodes[str(child_move)] = SerialNode(current_board=child_board,
-                                                                     parent_move=child_move,
-                                                                     node_weight=weight)
+                            self.child_nodes[child_move] = SerialNode(current_board=child_board,
+                                                                     move_history=self.move_history+[child_move],
+                                                                     weight=weight)
 
                         
     def get_child(self, move):
@@ -72,12 +74,12 @@ class SerialNode:
             return child
 
 
-
+### add move_hitory from serial ###
 class ConcurrentNode:
-    def __init__(self, current_board=Board(), parent_move=None, node_weight=0, check=False):
+    def __init__(self, current_board=Board(), parent_move=None, weight=0, check=False):
         self.current_board = current_board
         self.parent_move = parent_move
-        self.node_weight = node_weight
+        self.weight = weight
         self.child_nodes = {}
         self.check = check
 
@@ -109,9 +111,9 @@ class ConcurrentNode:
             weight = child_board.move_piece(ipoint, fpoint)
         if weight and not child_board.test_check(1):
             if child_board.test_check(0): 
-                queue.put(ConcurretNode(current_board=child_board, parent_move=child_move, node_weight=weight, check=True))
+                queue.put(ConcurretNode(current_board=child_board, parent_move=child_move, weight=weight, check=True))
             else:
-                queue.put(ConcurrentNode(current_board=child_board, parent_move=child_move, node_weight=weight))
+                queue.put(ConcurrentNode(current_board=child_board, parent_move=child_move, weight=weight))
 
 
 

@@ -14,8 +14,8 @@ def main(screen):
                      "random": Random(),
                      "minimax": Minimax(),
                      "serial": SerialNode(),
-                     "concurrent": ConcurrentNode(),
-                     "hybrid": HybridNode()}
+                     "concurrent": SerialNode(),
+                     "hybrid": SerialNode()}
     player1 = settings_dict[player1]
     player2 = settings_dict[player2]
     node = settings_dict[node_type]
@@ -24,18 +24,31 @@ def main(screen):
     while True:
         if node.current_board.test_draw():
             window.draw()
-            sleep(1)
-            screen.clear()
-            node = settings_dict[node_type]
+            break
         node.gen_children()
         if len(node.child_nodes) == 0:
             window.checkmate()
             break
-
         if node.current_board.turn % 2 == 1:
-            node = player1.make_move(node.child_nodes)
+            temp_node = player1.make_move(node, window)
+            if temp_node == "exit":
+                window.exit()
+                break
+            elif not temp_node:
+                window.bad_move()
+                continue           
+            else:
+                node = temp_node
         else:
-            node = player2.make_move(node.child_nodes)
+            temp_node = player2.make_move(node, window)     
+            if temp_node == "exit":
+                window.exit()
+                break
+            elif not temp_node:
+                window.bad_move()
+                continue
+            else:
+                node = temp_node
         if node:
             if node.check:
                 window.check()
