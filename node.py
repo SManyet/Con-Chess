@@ -1,7 +1,7 @@
 #!/usr/bin/python
 # class for implementing move and Node generation
 
-from copy import deepcopy
+from copy import deepcopy, copy
 from board import Board
 from piece import Queen
 import multiprocessing
@@ -54,11 +54,11 @@ class SerialNode:
                     else:
                         child_move = str([ipoint, fpoint])
                         weight = child_board.move_piece(ipoint, fpoint)
-                    if weight and not child_board.test_check(1):
-                        if child_board.test_check(0): 
+                    if weight and not child_board.test_check(0):
+                        if child_board.test_check(1): 
                             self.child_nodes[child_move] = SerialNode(current_board=child_board,
                                                                      move_history=self.move_history+[child_move],
-                                                                     weight=weight,
+                                                                     weight=weight + offset*100,
                                                                      check=True)
                         else:
                             self.child_nodes[child_move] = SerialNode(current_board=child_board,
@@ -76,14 +76,14 @@ class SerialNode:
 
 ### add move_hitory from serial ###
 class ConcurrentNode:
-    def __init__(self, current_board=Board(), parent_move=None, weight=0, check=False):
+    def __init__(self, current_board=Board(), move_history=[], weight=0, check=False):
         self.current_board = current_board
-        self.parent_move = parent_move
+        self.move_history = move_history
         self.weight = weight
         self.child_nodes = {}
         self.check = check
 
-    def eval_node(self, ipoint, fpoint, symbol, current_board, queue):
+    def eval_node(self, ipoint, fpoint, symbol, move_history, current_board, queue):
         child_board = deepcopy(current_board)
         if fpoint == "0-0": 
             weight = 0
@@ -105,15 +105,15 @@ class ConcurrentNode:
                 child_board.board_array[fpoint[0]][fpoint[1]] = Queen((fpoint[0], fpoint[1]), True, 'Q')
             child_board.inc_turn()
             weight = 100
-            child_move = [ipoint, fpoint]
+            child_move = str([ipoint, fpoint])
         else:
-            child_move = [ipoint, fpoint]
+            child_move = str([ipoint, fpoint])
             weight = child_board.move_piece(ipoint, fpoint)
         if weight and not child_board.test_check(1):
             if child_board.test_check(0): 
-                queue.put(ConcurretNode(current_board=child_board, parent_move=child_move, weight=weight, check=True))
+                queue.put(ConcurretNode(current_board=child_board, move_history=move_history+[child_move], weight=weight, check=True))
             else:
-                queue.put(ConcurrentNode(current_board=child_board, parent_move=child_move, weight=weight))
+                queue.put(ConcurrentNode(current_board=child_board, move_history=move_history+[child_move], weight=weight))
 
 
 
@@ -133,7 +133,7 @@ class ConcurrentNode:
                     if king_castle:
                         move_list.append("0-0")
                 for fpoint in move_list:
-                    proc = multiprocessing.Process(target=self.eval_node, args=(ipoint, fpoint, symbol, self.current_board, queue,))
+                    proc = multiprocessing.Process(target=self.eval_node, args=(ipoint, fpoint, symbol, self.move_history, self.current_board, queue,))
                     processes.append(proc)
                     proc.start()
                 for p in processes:
@@ -141,7 +141,7 @@ class ConcurrentNode:
                 while True:
                     try:
                         child_node = queue.get(False)
-                        move = str(child_node.parent_move)
+                        move = str(child_node.move_history[-1])
                         self.child_nodes[move] = child_node
                     except:
                         break

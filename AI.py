@@ -20,21 +20,13 @@ class Human:
 
 class Minimax:
     def make_move(self, node, window):
-        future_node = self.search_future(node, 5)
-        next_move = future_node.move_history[-5]
+        future_node = self.search_future(node, 2)
+        next_move = future_node.move_history[-2]
         if len(next_move) == 1:
             next_move = next_move[0]
-        try:
-            next_node = node.child_nodes[next_move]
-            if next_node:
-                return next_node
-        except:
-            breakpoint()
-        
-
-
-
-
+        next_node = node.child_nodes[next_move]
+        if next_node:
+            return next_node
 
     def search_future(self, node, depth):
         if len(node.child_nodes) == 0:
@@ -44,21 +36,30 @@ class Minimax:
         if depth == 0:
             return node
         elif node.current_board.turn % 2 == 1:
-            max_weight = -100
-            for moves, child in node.child_nodes.items():
+            max_weight = node.weight
+            max_child = None
+            for child in node.child_nodes.values():
                 grandchild = self.search_future(child, depth - 1)
                 if grandchild.weight >= max_weight:
-                    return grandchild
-                else:
-                    return node
+                    max_weight = grandchild.weight
+                    max_child = grandchild
+            if max_child:
+                return max_child
+            else:
+                x = 5 / 0
         else:
-            min_weight = 100
+            min_weight = node.weight
+            min_child = None
             for child in node.child_nodes.values():
                 grandchild = self.search_future(child, depth - 1)
                 if grandchild.weight <= min_weight:
-                    return grandchild
-                else:
-                    return node
+                    min_weight = grandchild.weight
+                    min_child = grandchild
+
+            if min_child:
+                return min_child
+            else:
+                x = 5 / 0
 
 
 

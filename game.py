@@ -14,7 +14,7 @@ def main(screen):
                      "random": Random(),
                      "minimax": Minimax(),
                      "serial": SerialNode(),
-                     "concurrent": SerialNode(),
+                     "concurrent": ConcurrentNode(),
                      "hybrid": SerialNode()}
     player1 = settings_dict[player1]
     player2 = settings_dict[player2]
